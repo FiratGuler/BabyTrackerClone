@@ -16,8 +16,8 @@ class SymptompsSelectedVC: UIViewController {
     
     private let customNavBar = CustomNavigationBar()
     private let saveButton = CustomSaveButton()
-    private var symptompsArray : [SymptompsModel] = SymptompsModel.SymptosData
-    private var collectionView = NeonCollectionView<SymptompsModel, SymptompsCollectionCell>()
+    private var symptompsArray : [SymptompsItem] = SymptompsItem.SymptosData
+    private var collectionView = NeonCollectionView<SymptompsItem, SymptompsCollectionCell>()
 
     weak var delegate: SymptompsSelectedDelegate?
     
@@ -56,8 +56,8 @@ class SymptompsSelectedVC: UIViewController {
     }
     
     private func configureCollectionView() {
-        collectionView = NeonCollectionView<SymptompsModel, SymptompsCollectionCell>(
-            objects: SymptompsModel.SymptosData,
+        collectionView = NeonCollectionView<SymptompsItem, SymptompsCollectionCell>(
+            objects: SymptompsItem.SymptosData,
             itemsPerRow: 2,
             leftPadding: 25,
             rightPadding: 25,

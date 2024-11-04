@@ -10,16 +10,17 @@ import NeonSDK
 
 
 
-final class FeedingVC: UIViewController {
+final class FeedingVC: UIViewController, UITextFieldDelegate {
     
     private let customNavBar = CustomNavigationBar()
     private let timeTextfield = CustomTextfield(placetext: "Time", inputType: .textField, keyboardType: .numberPad)
     private let amountTextfield = CustomTextfield(placetext: "Amount (ml)", inputType: .textField, keyboardType: .numberPad)
     private let noteTextView = CustomTextfield(placetext: "Note", inputType: .textView)
     private let saveButton = CustomSaveButton()
-    
+    private var feedingId : String?
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupUI()
     }
     
@@ -51,6 +52,8 @@ final class FeedingVC: UIViewController {
     }
     
     private func configureTextfields() {
+        timeTextfield.showDatePicker()
+        
         view.addSubview(timeTextfield)
         timeTextfield.snp.makeConstraints { make in
             make.top.equalTo(customNavBar.snp.bottom).offset(32)
@@ -83,6 +86,29 @@ final class FeedingVC: UIViewController {
         saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
     }
     
+    private func formatForFirebase() -> FeedingFirebaseModel? {
+        
+        feedingId = UUID().uuidString
+        
+        guard let timeString = timeTextfield.text,
+              let date = timeString.convertToDate() else {
+            print("Time Textfield error")
+            return nil
+        }
+        
+        guard let amount = amountTextfield.text else {
+            print("Amount Textfield error")
+            return nil
+        }
+        
+        guard let note = noteTextView.textViewContent else {
+            print("Note TextView error")
+            return nil
+        }
+        
+        return FeedingFirebaseModel(id: feedingId!, time: date, amount: amount, note: note)
+    }
+    
     // MARK: - Selector
     
     @objc private func leftBarButtonTapped() {
@@ -92,11 +118,23 @@ final class FeedingVC: UIViewController {
     @objc private func saveButtonTapped() {
         
         LottieManager.showFullScreenLottie(animation: .loadingPlane)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3){
-            LottieManager.removeFullScreenLottie()
+        
+        guard let feedingModel = formatForFirebase() else {
+            print("Failed to create FeedingFirebaseModel.")
+            return
         }
-
+        
+        guard let id = feedingId else {
+            print("Failed to create ID.")
+            return
+        }
+        
+        FirebaseManager.shared.addFeeding(feedingModel: feedingModel, uuid: id)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+            LottieManager.removeFullScreenLottie()
+            self.dismiss(animated: true)
+        }
+        
     }
 }
-
 

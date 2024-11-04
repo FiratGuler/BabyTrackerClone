@@ -74,7 +74,7 @@ class CustomNavigationBar: UIView {
         addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.bottom.equalToSuperview()
+            make.centerY.equalToSuperview()
         }
         
         addSubview(rightButton)

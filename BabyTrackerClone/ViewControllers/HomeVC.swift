@@ -100,12 +100,10 @@ final class HomeVC: UIViewController {
     }
     
     @objc private func rightBarButtonTapped() {
-        print("right bar button Tapped")
+        present(destinationVC: CalendarVC(), slideDirection: .right)
     }
     
     @objc private func feedingButtonTapped() {
-        
-        
         present(destinationVC: FeedingVC(), slideDirection: .right)
     }
     

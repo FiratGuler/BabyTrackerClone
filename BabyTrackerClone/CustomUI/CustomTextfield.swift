@@ -19,43 +19,48 @@ enum KeyboardTypeOption {
 }
 
 
-class CustomTextfield: UIView {
+class CustomTextfield: UIView, UITextFieldDelegate {
+        
+    private var textField: UITextField?
+    private var textView: UITextView?
+    private var datePicker: UIDatePicker?
     
     let placeholderColor: UIColor = .placeholderColorApp
     var placeholderText = ""
     var onTap: (()-> Void)?
-    
-
-    
-    private var textField: UITextField?
-    private var textView: UITextView?
-    
     var text: String? {
-            get {
-                return textField?.text
-            }
-            set {
-                textField?.text = newValue
-            }
+        get {
+            return textField?.text
         }
+        set {
+            textField?.text = newValue
+        }
+    }
+    
+    var textViewContent: String? {
+        return textView?.text
+    }
+    
+    weak var textFieldDelegate: UITextFieldDelegate? {
+        didSet {
+            textField?.delegate = textFieldDelegate
+        }
+    }
+    
+    weak var textViewDelegate: UITextViewDelegate? {
+        didSet {
+            textView?.delegate = textViewDelegate
+        }
+    }
     
     
     // MARK: - Init
     
-    /// KeyboardType specified
-    init(placetext: String, inputType: TextInputType,keyboardType : KeyboardTypeOption) {
+    init(placetext: String, inputType: TextInputType,keyboardType : KeyboardTypeOption = .defaultKeyboard) {
         super.init(frame: .zero)
         
         placeholderText = placetext
         setupUI(inputType: inputType,keyboardType : keyboardType)
-    }
-    
-    /// Default keyboard type or Clickable func
-    init(placetext: String, inputType: TextInputType) {
-        super.init(frame: .zero)
-        
-        self.placeholderText = placetext
-        setupUI(inputType: inputType, keyboardType: .defaultKeyboard)
     }
     
     
@@ -99,6 +104,7 @@ class CustomTextfield: UIView {
         textField.leftViewMode = .always
         textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 20, height: 0))
         textField.font = UIFont(name: UIConstants.regularFont, size: 14)
+        
         self.addSubview(textField)
         textField.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -161,16 +167,32 @@ class CustomTextfield: UIView {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         self.addGestureRecognizer(tapGesture)
     }
-
+    
+    func showDatePicker() {
+        datePicker = UIDatePicker()
+        datePicker?.datePickerMode = .time
+        datePicker?.preferredDatePickerStyle = .wheels
+        datePicker?.addTarget(self, action: #selector(dateChanged(_:)), for: .valueChanged)
+        
+        textField?.inputView = datePicker
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    
     // MARK: - Selector
     
     @objc private func handleTap() {
-           onTap?()
-       }
+        onTap?()
+    }
+    
+    @objc private func dateChanged(_ sender: UIDatePicker) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "h:mm a"
+        textField?.text = dateFormatter.string(from: sender.date)
+    }
 }
 
 // MARK: - Extensions

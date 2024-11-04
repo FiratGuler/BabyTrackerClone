@@ -6,14 +6,16 @@
 //
 
 import UIKit
+import NeonSDK
 
 final class SymptompsVC: UIViewController {
-
+    
     private let customNavBar = CustomNavigationBar()
-    private let timeTextfield = CustomTextfield(placetext: "Time", inputType: .textField, keyboardType: .numberPad)
+    private let timeTextfield = CustomTextfield(placetext: "Time", inputType: .textField)
     private let symptonsTextfield = CustomTextfield(placetext: "Symptons", inputType: .clickableTextField)
     private let noteTextView = CustomTextfield(placetext: "Note", inputType: .textView)
     private let saveButton = CustomSaveButton()
+    private var symptompsId : String?
     
     var selectedSymptoms: [String] = []
     
@@ -49,6 +51,7 @@ final class SymptompsVC: UIViewController {
     }
     
     private func configureTextfields() {
+        timeTextfield.showDatePicker()
         
         view.addSubview(timeTextfield)
         timeTextfield.snp.makeConstraints { make in
@@ -91,9 +94,32 @@ final class SymptompsVC: UIViewController {
         present(destinationVC: symptompsVc, slideDirection: .right)
     }
     
-    func onSelectedSymptoms(selectedNames: [String]) {
+    private func onSelectedSymptoms(selectedNames: [String]) {
         symptonsTextfield.text = selectedNames.joined(separator: ", ")
-       }
+    }
+    
+    private func formatForFirebase() -> SymptompsFirebaseModel? {
+        
+        symptompsId = UUID().uuidString
+        
+        guard let timeString = timeTextfield.text,
+              let date = timeString.convertToDate() else {
+            print("Time Textfield error")
+            return nil
+        }
+        
+        guard !selectedSymptoms.isEmpty else {
+            print("Symptoms selection is empty")
+            return nil
+        }
+        
+        guard let note = noteTextView.textViewContent else {
+            print("Note TextView error")
+            return nil
+        }
+
+        return SymptompsFirebaseModel(id: symptompsId!, time: date, symptomps: selectedSymptoms, note: note)
+    }
     
     // MARK: - Selector
     
@@ -102,7 +128,20 @@ final class SymptompsVC: UIViewController {
     }
     
     @objc private func saveButtonTapped() {
-        print("saveButton tapped")
+        
+        LottieManager.showFullScreenLottie(animation: .loadingPlane)
+        
+        guard let symptompsModel = formatForFirebase() else {
+            print("Failed to create SymptompsFirebaseModel.")
+            return
+        }
+        
+        FirebaseManager.shared.addSymptomps(symptompsModel: symptompsModel, uuid: symptompsId!)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+            LottieManager.removeFullScreenLottie()
+            self.dismiss(animated: true)
+        }
     }
     
 }

@@ -61,11 +61,13 @@ final class SettingsVC: UIViewController {
             make.left.right.equalToSuperview().inset(20)
             make.height.equalTo(81)
         }
+        
+        premiumButton.addTarget(self, action: #selector(premiumButtonTapped), for: .touchUpInside)
     }
     
     private func setupMenuItems() {
         
-        for menuItem in SettingsMenuConstants.MenuItem.allItems {
+        for menuItem in SettingsMenuItem.MenuItem.allItems {
             let menuButton = SettingsMenuButton(menuItem: menuItem)
             view.addSubview(menuButton)
             
@@ -89,6 +91,11 @@ final class SettingsVC: UIViewController {
     @objc private func leftBarButtonTapped() {
         self.dismiss(animated: true)
         
+    }
+    
+    @objc private func premiumButtonTapped() {
+        
+        present(destinationVC: PaywallVC(),slideDirection:.left )
     }
     
 }

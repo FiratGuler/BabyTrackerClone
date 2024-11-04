@@ -9,14 +9,11 @@ import UIKit
 
 class CustomSaveButton : UIButton {
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        setupUI()
-    }
-    
-    private func setupUI(){
-        self.setTitle("Save", for: .normal)
+
+    init(buttonName : String = "Save") {
+        super.init(frame: .zero)
+        self.setTitle(buttonName, for: .normal)
+        self.backgroundColor = .appPurple
         self.setTitleColor(.white, for: .normal)
         self.titleLabel?.font = UIFont(name: UIConstants.mediumFont, size: 20)
         self.backgroundColor = .appPurple
@@ -26,6 +23,7 @@ class CustomSaveButton : UIButton {
         }
     }
     
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

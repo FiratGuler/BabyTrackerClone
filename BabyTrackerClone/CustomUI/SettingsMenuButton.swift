@@ -12,13 +12,13 @@ class SettingsMenuButton: UIButton {
     private var arrowImageView = UIImageView()
     private var iconImageView = UIImageView()
     
-    init(menuItem: SettingsMenuConstants.MenuItem) {
+    init(menuItem: SettingsMenuItem.MenuItem) {
         super.init(frame: .zero)
         
         setupUI(menuItem: menuItem)
     }
     
-    private func setupUI(menuItem: SettingsMenuConstants.MenuItem) {
+    private func setupUI(menuItem: SettingsMenuItem.MenuItem) {
 
         iconImageView.image = menuItem.icon
         addSubview(iconImageView)

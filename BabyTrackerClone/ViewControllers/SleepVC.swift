@@ -15,6 +15,7 @@ final class SleepVC: UIViewController {
     private let wokeUpTextfield = CustomTextfield(placetext: "Woke Up", inputType: .textField, keyboardType: .numberPad)
     private let noteTextView = CustomTextfield(placetext: "Note", inputType: .textView)
     private let saveButton = CustomSaveButton()
+    private var sleepId : String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,6 +50,7 @@ final class SleepVC: UIViewController {
     }
     
     private func configureTextFields(){
+        fellSleepTextfield.showDatePicker()
         view.addSubview(fellSleepTextfield)
         fellSleepTextfield.snp.makeConstraints { make in
             make.top.equalTo(customNavBar.snp.bottom).offset(32)
@@ -56,6 +58,7 @@ final class SleepVC: UIViewController {
             make.height.equalTo(60)
         }
         
+        wokeUpTextfield.showDatePicker()
         view.addSubview(wokeUpTextfield)
         wokeUpTextfield.snp.makeConstraints { make in
             make.top.equalTo(fellSleepTextfield.snp.bottom).offset(22)
@@ -80,6 +83,29 @@ final class SleepVC: UIViewController {
         saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
     }
     
+    private func formatForFirebase() -> SleepFirebaseModel? {
+        sleepId = UUID().uuidString
+        
+        guard let fellString = fellSleepTextfield.text,
+              let fellDate = fellString.convertToDate() else {
+            print("fellSleep Textfield error")
+            return nil
+        }
+        
+        guard let wokeString = wokeUpTextfield.text,
+              let wokeUpDate = wokeString.convertToDate() else {
+            print("wokeUp Textfield error")
+            return nil
+        }
+        
+        guard let note = noteTextView.textViewContent else {
+            print("Note TextView error")
+            return nil
+        }
+        
+        return SleepFirebaseModel(id: sleepId!, fellSleep: fellDate, wokeUp: wokeUpDate, note: note)
+    }
+    
     // MARK: - Selector
     
     @objc private func leftBarButtonTapped() {
@@ -87,11 +113,26 @@ final class SleepVC: UIViewController {
     }
     
     @objc private func saveButtonTapped() {
-        print("savebuttontapped")
+        
         LottieManager.showFullScreenLottie(animation: .loadingPlane)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3){
-            LottieManager.removeFullScreenLottie()
+        
+        guard let sleepModel = formatForFirebase() else {
+            print("Failed to create SleepFirebaseModel.")
+            return
         }
+        
+        guard let id = sleepId else {
+            print("Failed to create ID.")
+            return
+        }
+        
+        FirebaseManager.shared.addSleep(sleepModel: sleepModel, uuid: id)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+            LottieManager.removeFullScreenLottie()
+            self.dismiss(animated: true)
+        }
+        
     }
 }
 

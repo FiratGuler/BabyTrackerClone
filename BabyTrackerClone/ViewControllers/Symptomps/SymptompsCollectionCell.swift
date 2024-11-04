@@ -8,7 +8,7 @@
 import UIKit
 import NeonSDK
 
-class SymptompsCollectionCell : NeonCollectionViewCell <SymptompsModel> {
+class SymptompsCollectionCell : NeonCollectionViewCell <SymptompsItem> {
     private var imageView = UIImageView()
     
     override init(frame:CGRect) {
@@ -37,7 +37,7 @@ class SymptompsCollectionCell : NeonCollectionViewCell <SymptompsModel> {
         }
     }
     
-    override func configure(with symptomps : SymptompsModel) {
+    override func configure(with symptomps : SymptompsItem) {
         super.configure(with: symptomps)
         imageView.image = UIImage(named: symptomps.imageName)
         

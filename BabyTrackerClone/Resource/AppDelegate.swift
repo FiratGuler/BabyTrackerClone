@@ -7,6 +7,8 @@
 
 import UIKit
 import NeonSDK
+import Firebase
+import Adapty
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,6 +18,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         Font.configureFonts(font: .Poppins)
+        FirebaseApp.configure()
+        AuthManager.signInAnonymously()
+        
+        AdaptyManager.configure(withAPIKey: "public_live_J2LhHYDu.Y7y8sVxv1i1RpuyjgQ87",
+                                       placementIDs: ["placement1"])
         Neon.activatePremiumTest()
 
         Neon.configure(

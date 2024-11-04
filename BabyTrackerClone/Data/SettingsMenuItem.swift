@@ -7,11 +7,12 @@
 
 import UIKit
 
-struct SettingsMenuConstants {
+struct SettingsMenuItem {
+    
     struct MenuItem {
         let title: String
         let icon: UIImage?
-
+        
         static let allItems: [MenuItem] = [
             MenuItem(title: "Rate Us", icon: UIImage(named: "RateUsIcon")),
             MenuItem(title: "Terms of Use", icon: UIImage(named: "TicketIcon")),
