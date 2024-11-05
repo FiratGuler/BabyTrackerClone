@@ -13,7 +13,7 @@ import NeonSDK
 final class FeedingVC: UIViewController, UITextFieldDelegate {
     
     private let customNavBar = CustomNavigationBar()
-    private let timeTextfield = CustomTextfield(placetext: "Time", inputType: .textField, keyboardType: .numberPad)
+    private let timeTextfield = CustomTextfield(placetext: "Time", inputType: .textField)
     private let amountTextfield = CustomTextfield(placetext: "Amount (ml)", inputType: .textField, keyboardType: .numberPad)
     private let noteTextView = CustomTextfield(placetext: "Note", inputType: .textView)
     private let saveButton = CustomSaveButton()
@@ -52,7 +52,9 @@ final class FeedingVC: UIViewController, UITextFieldDelegate {
     }
     
     private func configureTextfields() {
+        
         timeTextfield.showDatePicker()
+        timeTextfield.onTextChange = checkTextFields
         
         view.addSubview(timeTextfield)
         timeTextfield.snp.makeConstraints { make in
@@ -61,21 +63,28 @@ final class FeedingVC: UIViewController, UITextFieldDelegate {
             make.height.equalTo(60)
         }
         
+        amountTextfield.onTextChange = checkTextFields
+        
         view.addSubview(amountTextfield)
         amountTextfield.snp.makeConstraints { make in
             make.top.equalTo(timeTextfield.snp.bottom).offset(22)
             make.left.right.height.equalTo(timeTextfield)
         }
         
+        noteTextView.onTextChange = checkTextFields
         view.addSubview(noteTextView)
         noteTextView.snp.makeConstraints { make in
             make.top.equalTo(amountTextfield.snp.bottom).offset(22)
             make.left.right.equalTo(timeTextfield)
             make.height.equalTo(view.snp.height).dividedBy(3)
         }
+        
+    
     }
     
     private func configureSaveButton() {
+        
+        saveButton.isHidden = true
         
         view.addSubview(saveButton)
         saveButton.snp.makeConstraints { make in
@@ -109,6 +118,17 @@ final class FeedingVC: UIViewController, UITextFieldDelegate {
         return FeedingFirebaseModel(id: feedingId!, time: date, amount: amount, note: note)
     }
     
+    private func checkTextFields() {
+        let isTimeFilled = !(timeTextfield.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let isAmountFilled = !(amountTextfield.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        
+        let isNoteFilled = !(noteTextView.textViewContent ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                            && noteTextView.textViewContent != noteTextView.placeholderText
+
+        saveButton.isHidden = !(isTimeFilled && isAmountFilled && isNoteFilled)
+    }
+
+    
     // MARK: - Selector
     
     @objc private func leftBarButtonTapped() {
@@ -130,11 +150,14 @@ final class FeedingVC: UIViewController, UITextFieldDelegate {
         }
         
         FirebaseManager.shared.addFeeding(feedingModel: feedingModel, uuid: id)
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 2){
             LottieManager.removeFullScreenLottie()
             self.dismiss(animated: true)
         }
         
     }
+    
+
 }
 

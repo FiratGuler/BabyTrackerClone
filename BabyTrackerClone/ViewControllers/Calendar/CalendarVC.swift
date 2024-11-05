@@ -85,7 +85,7 @@ final class CalendarVC: UIViewController {
         
         tableView = CalendarTableView(
             objects: firebaseData,
-            heightForRows: 52
+            heightForRows: 70
         )
 
         view.addSubview(tableView)

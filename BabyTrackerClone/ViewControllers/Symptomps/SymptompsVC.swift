@@ -52,6 +52,7 @@ final class SymptompsVC: UIViewController {
     
     private func configureTextfields() {
         timeTextfield.showDatePicker()
+        timeTextfield.onTextChange = checkTextFields
         
         view.addSubview(timeTextfield)
         timeTextfield.snp.makeConstraints { make in
@@ -59,6 +60,8 @@ final class SymptompsVC: UIViewController {
             make.left.right.equalToSuperview().inset(22)
             make.height.equalTo(60)
         }
+        
+        symptonsTextfield.onTextChange = checkTextFields
         
         view.addSubview(symptonsTextfield)
         symptonsTextfield.snp.makeConstraints { make in
@@ -70,6 +73,8 @@ final class SymptompsVC: UIViewController {
             self?.didClickTextField()
         }
         
+        noteTextView.onTextChange = checkTextFields
+        
         view.addSubview(noteTextView)
         noteTextView.snp.makeConstraints { make in
             make.top.equalTo(symptonsTextfield.snp.bottom).offset(22)
@@ -79,6 +84,8 @@ final class SymptompsVC: UIViewController {
     }
     
     private func configureSaveButton() {
+        saveButton.isHidden = true
+        
         view.addSubview(saveButton)
         saveButton.snp.makeConstraints { make in
             make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(22)
@@ -119,6 +126,14 @@ final class SymptompsVC: UIViewController {
         }
 
         return SymptompsFirebaseModel(id: symptompsId!, time: date, symptomps: selectedSymptoms, note: note)
+    }
+    
+    private func checkTextFields() {
+        let isTimeFilled = !(timeTextfield.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let isSymptonsFilled = !(symptonsTextfield.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let isNoteFilled = !(noteTextView.textViewContent ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && noteTextView.textViewContent != noteTextView.placeholderText
+        
+        saveButton.isHidden = !(isTimeFilled && isSymptonsFilled && isNoteFilled)
     }
     
     // MARK: - Selector

@@ -11,8 +11,8 @@ import NeonSDK
 final class SleepVC: UIViewController {
     
     private let customNavBar = CustomNavigationBar()
-    private let fellSleepTextfield = CustomTextfield(placetext: "Fell Sleep", inputType: .textField, keyboardType: .numberPad)
-    private let wokeUpTextfield = CustomTextfield(placetext: "Woke Up", inputType: .textField, keyboardType: .numberPad)
+    private let fellSleepTextfield = CustomTextfield(placetext: "Fell Sleep", inputType: .textField)
+    private let wokeUpTextfield = CustomTextfield(placetext: "Woke Up", inputType: .textField)
     private let noteTextView = CustomTextfield(placetext: "Note", inputType: .textView)
     private let saveButton = CustomSaveButton()
     private var sleepId : String?
@@ -49,8 +49,10 @@ final class SleepVC: UIViewController {
         customNavBar.leftButton.addTarget(self, action: #selector(leftBarButtonTapped), for: .touchUpInside)
     }
     
-    private func configureTextFields(){
+    private func configureTextFields() {
         fellSleepTextfield.showDatePicker()
+        fellSleepTextfield.onTextChange = checkTextFields
+        
         view.addSubview(fellSleepTextfield)
         fellSleepTextfield.snp.makeConstraints { make in
             make.top.equalTo(customNavBar.snp.bottom).offset(32)
@@ -59,11 +61,15 @@ final class SleepVC: UIViewController {
         }
         
         wokeUpTextfield.showDatePicker()
+        wokeUpTextfield.onTextChange = checkTextFields
+        
         view.addSubview(wokeUpTextfield)
         wokeUpTextfield.snp.makeConstraints { make in
             make.top.equalTo(fellSleepTextfield.snp.bottom).offset(22)
             make.left.right.height.equalTo(fellSleepTextfield)
         }
+        
+        noteTextView.onTextChange = checkTextFields
         
         view.addSubview(noteTextView)
         noteTextView.snp.makeConstraints { make in
@@ -73,7 +79,9 @@ final class SleepVC: UIViewController {
         }
     }
     
-    private func configureSaveButton(){
+    private func configureSaveButton() {
+        saveButton.isHidden = true
+        
         view.addSubview(saveButton)
         saveButton.snp.makeConstraints { make in
             make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(22)
@@ -104,6 +112,14 @@ final class SleepVC: UIViewController {
         }
         
         return SleepFirebaseModel(id: sleepId!, fellSleep: fellDate, wokeUp: wokeUpDate, note: note)
+    }
+    
+    private func checkTextFields() {
+        let isFellSleepFilled = !(fellSleepTextfield.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let isWokeUpFilled = !(wokeUpTextfield.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let isNoteFilled = !(noteTextView.textViewContent ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty  && noteTextView.textViewContent != noteTextView.placeholderText
+        
+        saveButton.isHidden = !(isFellSleepFilled && isWokeUpFilled && isNoteFilled)
     }
     
     // MARK: - Selector

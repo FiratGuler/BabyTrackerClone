@@ -13,6 +13,7 @@ class CalendarTableViewCell: NeonTableViewCell<FirebaseDataType> {
     private var iconImageView = UIImageView()
     private var titleLabel = UILabel()
     private var dateLabel = UILabel()
+    private var containerView = UIView()
     
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -48,7 +49,7 @@ class CalendarTableViewCell: NeonTableViewCell<FirebaseDataType> {
 
     }
         
-    private func setupUI(){
+    private func setupUI() {
         
         configureSelf()
         configureIconImageView()
@@ -56,16 +57,22 @@ class CalendarTableViewCell: NeonTableViewCell<FirebaseDataType> {
         configureDateLabel()
     }
     
-    private func configureSelf(){
-        self.backgroundColor = .settingsMenu
-        self.layer.cornerRadius = 25
+    private func configureSelf() {
+        containerView.backgroundColor = .settingsMenu
+        containerView.layer.cornerRadius = 25
+        
+        addSubview(containerView)
+        containerView.snp.makeConstraints { make in
+            make.bottom.top.equalToSuperview().inset(5)
+            make.left.right.equalToSuperview().inset(10)
+        }
         
     }
     
-    private func configureIconImageView(){
+    private func configureIconImageView() {
         iconImageView.contentMode = .scaleAspectFit
         
-        contentView.addSubview(iconImageView)
+        containerView.addSubview(iconImageView)
         iconImageView.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.left.equalToSuperview()
@@ -73,19 +80,19 @@ class CalendarTableViewCell: NeonTableViewCell<FirebaseDataType> {
         }
     }
     
-    private func configureTitleLabel(){
+    private func configureTitleLabel() {
         titleLabel.textColor = .appPurple
         
-        contentView.addSubview(titleLabel)
+        containerView.addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
             make.left.equalTo(iconImageView.snp.right)
             make.centerY.equalToSuperview()
         }
     }
     
-    private func configureDateLabel(){
+    private func configureDateLabel() {
         
-        contentView.addSubview(dateLabel)
+        containerView.addSubview(dateLabel)
         dateLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.right.equalToSuperview().inset(15)

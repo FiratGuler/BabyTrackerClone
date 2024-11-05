@@ -20,7 +20,7 @@ enum KeyboardTypeOption {
 
 
 class CustomTextfield: UIView, UITextFieldDelegate {
-        
+    
     private var textField: UITextField?
     private var textView: UITextView?
     private var datePicker: UIDatePicker?
@@ -28,6 +28,7 @@ class CustomTextfield: UIView, UITextFieldDelegate {
     let placeholderColor: UIColor = .placeholderColorApp
     var placeholderText = ""
     var onTap: (()-> Void)?
+    var onTextChange: (() -> Void)?
     var text: String? {
         get {
             return textField?.text
@@ -61,6 +62,14 @@ class CustomTextfield: UIView, UITextFieldDelegate {
         
         placeholderText = placetext
         setupUI(inputType: inputType,keyboardType : keyboardType)
+        
+        textField?.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        NotificationCenter.default.addObserver(self, selector: #selector(textViewDidChange), name: UITextView.textDidChangeNotification, object: textView)
+        
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: UITextView.textDidChangeNotification, object: textView)
     }
     
     
@@ -193,6 +202,15 @@ class CustomTextfield: UIView, UITextFieldDelegate {
         dateFormatter.dateFormat = "h:mm a"
         textField?.text = dateFormatter.string(from: sender.date)
     }
+    
+    @objc private func textFieldDidChange() {
+        onTextChange?()
+    }
+    
+    @objc private func textViewDidChange() {
+        onTextChange?()
+    }
+    
 }
 
 // MARK: - Extensions
